@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  app:
+    container_name: easyScan_server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+  database:
+    image: mongo
+    container_name: db_easyScan
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongodb:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: development
+      MONGO_INITDB_USER: root
+      MONGO_INITDB_PWD: password
+
+volumes:
+  database-data:
