@@ -1,9 +1,20 @@
 export{}
 const mongoose = require("mongoose");
+import { Schema, model, connect} from "mongoose";
+
 const bcrypt = require("bcryptjs");
 
+export interface IUser {
+    username: string,
+    email: string,
+    password: string,
+    verificationToken: string,
+    avatar: string,
+    verified: boolean,
+    createdAt: number,
+}
 
-const userModel = new mongoose.Schema({
+const userModel = new Schema<IUser>({
     username: {
         type: String,
         required: true,
@@ -39,4 +50,4 @@ const userModel = new mongoose.Schema({
 }, {timestamps: true})
 
 
-module.exports = mongoose.model('User', userModel);
+module.exports = model<IUser>('User', userModel);

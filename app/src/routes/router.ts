@@ -1,11 +1,12 @@
 export {}
 const express = require("express");
 const { signup} = require('../controllers/userController')
+const userController = require('../controllers/userController')
 const router = express.Router();
 const { check } = require('express-validator')
 
-router.post("/hey", signup)
-
+router.post("/signup", userController.signup)
+router.post("/signing", userController.signing)
 router.get("/API_1",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.json({"status": "200"});

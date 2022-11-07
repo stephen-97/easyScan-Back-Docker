@@ -5,9 +5,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 module.exports = {
+
     usernameSyntaxVerification: (username: string): boolean => {
         return username.length > 3 && username.length < 20;
     },
+
     usernameDatabaseVerification: (username: string): boolean => {
         User.findOne({ username: username}, (err, result) => {
             if(result) {
@@ -16,9 +18,11 @@ module.exports = {
         })
         return  true
     },
+
     emailSyntaxVerification: (email: string): boolean => {
         return /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/.test(email);
     },
+
     emailDatabaseVerification: (email: string): boolean => {
         User.findOne({ email: email}, (err, result) => {
             if(result) {
@@ -27,9 +31,31 @@ module.exports = {
         })
         return  true
     },
+
     passwordVerification: (password: string): boolean => {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password);
     },
+
+    loginVerification: async (usernameOrEmail: string) => {
+        switch (module.exports.emailSyntaxVerification(usernameOrEmail)){
+            case true: {
+                return await new Promise((res, rej) => {
+                    User.findOne({ email: usernameOrEmail}, (err, result) => {
+                        if(err) rej(err);
+                        res(result)
+                    })
+                })
+            }
+            default: {
+                return await new Promise((res, rej) => {
+                    User.findOne({ username: usernameOrEmail}, (err, result) => {
+                        if(err) rej(err);
+                        res(result)
+                    })
+                })
+            }
+        }
+    }
 }
 export {}
 

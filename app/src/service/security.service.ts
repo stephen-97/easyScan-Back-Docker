@@ -2,22 +2,35 @@ export {}
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+import {IUser} from "../models/user.model";
 
 
 module.exports = {
     hashPassword: async (password: string) => {
         const salt = await bcrypt.genSalt(10);
-        return  bcrypt.hash(password, 10, salt)
+        return await new Promise((res, rej) => {
+            bcrypt.hash(password, 10, (err, hash) => {
+                if(err) rej(err);
+                res(hash)
+            })
+        })
     },
-    generateJwt: (email: string) => {
-        let payload = { email: email }
+    generateJwt: (user: IUser) => {
+        let payload = {
+            username: user.username,
+            email: user.email,
+            avatar: user.avatar,
+            createdAd: user.createdAt
+        }
         return jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn: '24h'});
     },
-    comparePassword: async (databasePassword: string, password: string) => {
-        bcrypt.compare(password, databasePassword, (err, result) => {
-            if(err) throw new Error(err);
-            return result;
-        });
+    comparePassword: async (password: string, databasePassword: string) => {
+        return await new Promise((res, rej) => {
+            bcrypt.compare(password, databasePassword, (err, result) => {
+                if(err) rej(err);
+                res(result);
+            });
+        })
     }
 }
 

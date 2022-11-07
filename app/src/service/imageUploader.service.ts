@@ -15,6 +15,7 @@ module.exports = {
         }
     },
     avatarUploader:  (base64data: string, username: string, ): any => {
+        if(!base64data) return null;
         const projectPath = dirname(require.main.filename);
         const avatarType = module.exports.imageType(base64data.replace(/^data:image\/\w+;base64,/, ""))
         if(!avatarType) throw Error("Erreur, fichier non conforme")
