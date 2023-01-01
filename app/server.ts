@@ -1,3 +1,4 @@
+import * as path from "path";
 
 const apiRoutes = require("./src/routes/router.ts");
 const express = require('express')
@@ -25,7 +26,8 @@ app.get('/', (req, res, next) => {
 })
 app.use(express.json())
 
-app.use(express.static('src/public'));
+
+app.use(express.static(path.resolve('./src')));
 app.use(function(req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');

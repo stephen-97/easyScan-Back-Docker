@@ -7,35 +7,82 @@ const { check } = require('express-validator')
 
 router.post("/signup", userController.signup)
 router.post("/signing", userController.signing)
-router.get("/API_1",  async (req, res) => {
+
+router.delete("/API_1/:mailOldUnite/:mail",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    res.json({"status": "200"});
+    await res.status(204).json({"status": 201});
 })
 
-router.post("/API_2",  async (req, res) => {
+router.delete("/API_2",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    res.json({"status": 202, "message": "Erreur serveur"});
+    await res.status(201).json({"status": 204, "message": "ressource créé"});
 })
 
-router.put("/API_3",  async (req, res) => {
-    const token = req.header('Authorization');
+router.delete("/API_3/:mailOldUnite/:mail",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    res.json({"status": 201, "response": req.body});
+    await res.status(204).json({"status": 204, "response": req.body});
 })
 
 router.post("/API_4",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    res.json({"foo": "aaaa3"});
+    await res.status(201).json({"status": 204, "response": "ressorce supprimée  "});
 })
 
-router.post("/API_5",  async (req, res) => {
+router.delete("/API_5/:mailOldUnite/:mail",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    res.json({"status": 201});
+    await res.status(204).json({"status": 200});
 })
 
-router.post("/sign",  async (req, res) => {
+router.post("/API_6",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    res.json({"status": 201});
+    await res.status(201).json({'mail' : 'test1@hotmail.com', 'rio': '123456'});
 })
 
+router.delete("/API_7/:mail",  async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    await res.status(204).json({"status": 204});
+})
+
+router.get("/API_8",  async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    const emails_array = '["test1@hotmail.com", "test2@hotmail.com", "test3@hotmail.com"]'
+    await res.status(200).json(['test1@hotmail.com', 'test2@hotmail.com', 'test3@hotmail.com']);
+})
+
+router.post("/API_9",  async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    console.log(req.body)
+    await res.status(200).json({"status": 204});
+})
+router.post("/API_10",  async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    await res.status(201).json({
+        "mail": "newuser@gendarmerie.interieur.gouv.fr",
+        "type": "Bali",
+        "cyrusRefProvider": "basic.ref_cyrus_persister",
+        "cyrusHostProvider": "dappmcepers01.pgs",
+        "cyrus": {
+            "uniqueid": "0cx41wj7lbe0f7vr37zhsa3v",
+            "uid": "user\/newuser@gendarmerie.interieur.gouv.fr",
+            "acls": [
+                {
+                    "key": "newuser@gendarmerie.interieur.gouv.fr",
+                    "value": "lrswipkxtecdan"
+                }
+            ],
+            "msg": "Completed"
+        },
+        "references": {
+            "mail": "newuser@gendarmerie.interieur.gouv.fr",
+            "host": "dappmcepers01.pgs",
+            "id": "0cx41wj7lbe0f7vr37zhsa3v",
+            "perimeter": "MCE",
+            "type": "Bali",
+            "nom": "nom",
+            "prenom": "prenom",
+            "displayname": "newuser",
+            "active": true
+        }
+    });
+})
 module.exports = router;

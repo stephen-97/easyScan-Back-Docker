@@ -50,19 +50,19 @@ module.exports = {
     signing: async (req: Request, res: Response) => {
 
         //Vérifie si la requête n'est pas json vide
-        if(!validationResult(req).isEmpty()) return res.status(400).json({status:400, msg: 'Erreur requête'})
+        if(!validationResult(req).isEmpty()) return res.json({status:400, msg: 'Erreur requête'})
 
         //vérifications
         const user = await userService.loginVerification(req.body.emailOrUsername)
-        if(!user) return res.status(404).json({ status: 404, msg: 'informations incorrect'})
+        console.log(req.body)
+
+        if(!user) return res.json({ status: 404, msg: 'informations incorrect'})
         const correctPassword = await securityService.comparePassword(req.body.password, user.password)
-        if(!correctPassword) return res.status(404).json({ status: 404, msg: 'informations incorrect'})
+        if(!correctPassword) return res.json({ status: 404, msg: 'informations incorrect'})
 
         const jwt = securityService.generateJwt(user);
-        console.log(jwt_decode(jwt))
-        return res.status(200).json({ status: 200, msg: 'Connexion avec succès', jwt: jwt})
+        return res.json({ status: 200, msg: 'Connexion avec succès', jwt: jwt})
     },
-
 }
 /**
  *  const user = new User(req.body)
