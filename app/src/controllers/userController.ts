@@ -54,7 +54,6 @@ module.exports = {
 
         //vérifications
         const user = await userService.loginVerification(req.body.emailOrUsername)
-        console.log(req.body)
 
         if(!user) return res.json({ status: 404, msg: 'informations incorrect'})
         const correctPassword = await securityService.comparePassword(req.body.password, user.password)

@@ -31,6 +31,17 @@ module.exports = {
                 res(result);
             });
         })
+    },
+    jwtValidity: (token: string) => {
+        let decodedJWT = null;
+        jwt.verify(token, process.env.JWT_SECRET_KEY,  (err, decoded )=> {
+            if (err) return;
+            decodedJWT = decoded
+        });
+        return decodedJWT;
+    },
+    jwtRemoveBearerFromString : (jwt: string) => {
+        return jwt.replace("Bearer","");
     }
 }
 
