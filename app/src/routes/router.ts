@@ -10,6 +10,8 @@ router.post("/signup", userController.signup)
 router.post("/signing", userController.signing)
 router.put("/changeEmail", userManagerController.changeEmail)
 router.put("/changePassword", userManagerController.changePassword)
+router.put("/changeAvatar", userManagerController.changeAvatar)
+router.delete("/delete", userManagerController.delete)
 
 router.delete("/API_1/:mailOldUnite/:mail",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
