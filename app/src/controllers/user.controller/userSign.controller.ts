@@ -1,13 +1,13 @@
 import {Request, Response} from "express";
 
 export{}
-const User = require("../models/user.model.ts");
+const User = require("../../models/user.model.ts");
 const { validationResult } = require('express-validator');
 const uniqueValidator = require('mongoose-unique-validator');
 const mongoose = require("mongoose");
-const userService  = require('../service/user.service.ts');
-const securityService = require('../service/security.service')
-const imageUploaderService = require('../service/imageUploader.service')
+const userService  = require('../../service/user.service.ts');
+const securityService = require('../../service/security.service')
+const imageUploaderService = require('../../service/imageUploader.service')
 const bcrypt = require("bcrypt");
 import jwt_decode from "jwt-decode";
 
@@ -63,44 +63,6 @@ module.exports = {
 
         const jwt = securityService.generateJwt(user);
         return res.json({ status: 200, msg: 'Connexion avec succès', jwt: jwt})
-    },
-
-    signupTest: async (req: Request, res: Response) => {
-        //vérifie si la requête n'est pas json vide
-        if(!validationResult(req).isEmpty()) return res.status(400).json({status:400, msg: 'Erreur requête'})
-
-        //vérifications
-        if(!userService.usernameSyntaxVerification(req.body.username)) return res.status(401).json({status: 401, msg: 'Email non conforme'})
-        if(await userService.usernameDatabaseVerification(req.body.username)) return res.status(401).json({status: 401, msg: 'Un compte utilise déjà ce pseudo'})
-        if(!userService.emailSyntaxVerification(req.body.email)) return res.status(401).json({status: 401, msg: 'Email non conforme'})
-        if(await userService.emailDatabaseVerification(req.body.email)) return res.status(401).json({status: 401, msg: 'Un compte utilise déjà cet email'})
-        //if(!userService.passwordVerification(req.body.password)) return res.status(401).json({status: 401, msg: 'Mot de passe non conforme'})
-
-        // Need hashedPassowrd, tokenVerification for email verification and avatarUploadedFile
-        const hashedPassword =  await securityService.hashPassword(req.body.password);
-        const tokenVerification = securityService.generateJwt(req.body.email);
-        const avatarFileName = imageUploaderService.avatarUploader(req.body.avatar, req.body.username);
-
-        // Create the new User object
-        const user = new User({
-            username: req.body.username,
-            email: req.body.email,
-            password: hashedPassword,
-            verificationToken: tokenVerification,
-            verified: false,
-            avatar: avatarFileName,
-        })
-
-
-        user.save((err) => {
-            if(err){
-                if(avatarFileName) {
-                    imageUploaderService.avatarDeleteFile(avatarFileName);
-                }
-                return res.status(400).json({ error: 'Ajout utilisateur impossible'})
-            }
-        })
-        return res.status(200).json({ status: 200, msg: 'Compte en attente de véirfication'})
     },
 }
 /**

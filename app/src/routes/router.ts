@@ -1,21 +1,20 @@
 export {}
 const express = require("express");
-const { signup} = require('../controllers/userController')
-const userController = require('../controllers/userController')
-const userManagerController = require('../controllers/userManagerController')
+const userSignController = require('../controllers/user.controller/userSign.controller')
+const userDeleteController = require('../controllers/user.controller/userDelete.controller')
+const userUpdateController = require('../controllers/user.controller/userUpdate.controller')
 const router = express.Router();
 const { check } = require('express-validator')
 
-router.post("/signup", userController.signup)
-router.post("/signupTest", userController.signupTest)
-router.post("/signing", userController.signing)
-router.put("/changeEmail", userManagerController.changeEmail)
-router.put("/changePassword", userManagerController.changePassword)
-router.put("/changeAvatar", userManagerController.changeAvatar)
-router.put("/changeShockingContent", userManagerController.changeShockingContent)
-router.put("/changeVerticalReading", userManagerController.changeVerticalReading)
-router.delete("/delete", userManagerController.delete)
-router.delete("/deleteProd", userManagerController.deleteProd)
+router.post("/signup", userSignController.signup)
+router.post("/signing", userSignController.signing)
+router.put("/changeEmail", userUpdateController.changeEmail)
+router.put("/changePassword", userUpdateController.changePassword)
+router.put("/changeAvatar", userUpdateController.changeAvatar)
+router.put("/changeShockingContent", userUpdateController.changeShockingContent)
+router.put("/changeVerticalReading", userUpdateController.changeVerticalReading)
+router.delete("/delete", userDeleteController.delete)
+router.delete("/deleteProd", userDeleteController.deleteProd)
 
 router.delete("/API_1/:mailOldUnite/:mail",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
