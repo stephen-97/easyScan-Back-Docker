@@ -12,6 +12,8 @@ export interface IUser {
     avatar: string,
     verified: boolean,
     createdAt: number,
+    shockingContent: boolean,
+    verticalReading: boolean
 }
 
 const userModel = new Schema<IUser>({
@@ -44,6 +46,14 @@ const userModel = new Schema<IUser>({
         trim: true,
     },
     verified: {
+        type: Boolean,
+        default: false,
+    },
+    shockingContent: {
+        type: Boolean,
+        default: true,
+    },
+    verticalReading: {
         type: Boolean,
         default: false,
     },

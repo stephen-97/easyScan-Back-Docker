@@ -17,7 +17,7 @@ module.exports = {
     changeEmail: async (req: Request, res: Response) => {
         const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
 
-        if(!securityService.jwtValidity(jwt)) return res.status(404).json({'msg': 'hey'})
+        if(!securityService.jwtValidity(jwt)) return res.status(404).json({'msg': 'Incorrect'})
         const decodedToken = securityService.jwtValidity(jwt);
 
         if(!userService.emailSyntaxVerification(req.body.email)) return res.status(400).json({'msg' : 'Paramètres incorrects'})
@@ -34,6 +34,9 @@ module.exports = {
         await User.updateOne(filter, update);
         return res.status(200).json({ message: 'Email modifié avec succès'})
     },
+
+
+
 
     changePassword: async (req: Request, res: Response) => {
         const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
@@ -58,25 +61,31 @@ module.exports = {
         return res.status(200).json({ msg: 'Mot de passe modificé avec succès'})
     },
 
+
+
     changeAvatar: async (req: Request, res: Response) => {
-        const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
-        if(!securityService.jwtValidity(jwt)) return res.status(404).json({'msg': 'Token incorrect'})
-        const decodedToken = securityService.jwtValidity(jwt);
+        if(!securityService.jwtValidity(req.headers.authorization)) return res.status(404).json({'msg': 'Token incorrect'})
+        const decodedToken = securityService.jwtValidity(req.headers.authorization);
 
         const user = await User.findOne({'email': decodedToken.email});
-        const avatarFileName = imageUploaderService.avatarUploader(req.body.avatar, user.username);
+        if(decodedToken.avatar) imageUploaderService.avatarDeleteFile(user.avatar)
+        const newAvatarFileName = imageUploaderService.avatarUploader(req.body.avatar, user.username);
 
-        const filter = { "email": decodedToken.email };
-        const update = { "avatar": avatarFileName}
-
-        await User.updateOne(filter, update, null, (err) => {
+        const update = { "avatar": newAvatarFileName };
+        const filter = { "email": user.email }
+        User.updateOne(filter, update, null, (err) => {
             if(err){
-                imageUploaderService.avatarDeleteFile(avatarFileName);
-                return res.status(400).json({ error: 'Update avatar impossible '})
+                imageUploaderService.avatarDeleteFile(newAvatarFileName);
+                return res.status(400).json({ error: 'Modification impossible'})
             }
-        });
-        return res.status(200).json({ msg: 'Avatar modifié avec succès'})
+        })
+
+        const userUpdated = await User.findOne({'email': decodedToken.email});
+        const newJwt = securityService.generateJwt(userUpdated);
+        return res.status(200).json({ msg: 'Avatar modifié avec succès', jwt: newJwt})
     },
+
+
 
     delete: async (req: Request, res: Response) => {
         const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
@@ -88,6 +97,50 @@ module.exports = {
         if(!correctPassword) return res.status(403).json({'msg' : 'Mauvais mot de passe'})
 
         await User.deleteOne({"email" : user.email})
+        return res.status(200).json({ msg: 'Compte supprimé !'})
+    },
+
+
+    changeShockingContent: async (req: Request, res: Response) => {
+         if(typeof req.body.shockingContent !== "boolean") return res.status(400).json({'msg': 'Mauvais paramètres'})
+
+         const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
+         if(!securityService.jwtValidity(jwt)) return res.status(400).json({'msg': 'Token incorrect'})
+         const decodedToken = securityService.jwtValidity(jwt);
+
+         const filter = { "username": decodedToken.username };
+         const update = { "shockingContent": req.body.shockingContent }
+         User.updateOne(filter, update, null, (err) => {
+            if(err){
+                return res.status(400).json({ error: 'Modification impossible'})
+            }
+        })
+
+        return res.status(200).json({ msg: 'Modification effectué !'})
+    },
+
+
+    changeVerticalReading: async (req: Request, res: Response) => {
+        if(typeof req.body.verticalReading !== "boolean") return res.status(400).json({'msg': 'Mauvais paramètres'})
+
+        const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
+        if(!securityService.jwtValidity(jwt)) return res.status(400).json({'msg': 'Token incorrect'})
+        const decodedToken = securityService.jwtValidity(jwt);
+
+        const filter = { "username": decodedToken.username };
+        const update = { "verticalReading": req.body.verticalReading }
+        User.updateOne(filter, update, null, (err) => {
+            if(err){
+                return res.status(400).json({ error: 'Modification impossible'})
+            }
+        })
+
+        return res.status(200).json({ msg: 'Modification effectué !'})
+    },
+
+    deleteProd: async (req: Request, res: Response) => {
+
+        await User.deleteOne({"username" : req.body.username})
         return res.status(200).json({ msg: 'Compte supprimé !'})
     },
 }

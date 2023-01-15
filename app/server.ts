@@ -17,6 +17,7 @@ mongoose.connect("mongodb://root:root@db_easyScan:27017/", {
     }
 });
 
+app.use(express.json({limit: '200mb'}));
 
 app.get('/', (req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");

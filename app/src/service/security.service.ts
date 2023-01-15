@@ -2,6 +2,7 @@ export {}
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const utilityService = require("./utility.service/utility.service")
 import {IUser} from "../models/user.model";
 
 
@@ -20,7 +21,7 @@ module.exports = {
             username: user.username,
             email: user.email,
             avatar: user.avatar,
-            createdAd: user.createdAt
+            createdAd: utilityService.convertDatetimeToFormat(user.createdAt)
         }
         return jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn: '24h'});
     },

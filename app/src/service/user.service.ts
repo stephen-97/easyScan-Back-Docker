@@ -10,27 +10,29 @@ module.exports = {
         return username.length > 3 && username.length < 20;
     },
 
-    usernameDatabaseVerification: (username: string): boolean => {
-        User.findOne({ username: username}, (err, result) => {
-            if(result) {
-                return false
-            }
+    usernameDatabaseVerification:  async (username: string) => {
+        return await new Promise((res, rej) => {
+            User.findOne({ username: username}, (err, result) => {
+                if(err) rej(err);
+                res(result)
+            })
         })
-        return  true
+    },
+
+    emailDatabaseVerification: async (email: string) => {
+        return await new Promise((res, rej) => {
+            User.findOne({ email: email}, (err, result) => {
+                if(err) rej(err);
+                res(result)
+            })
+        })
     },
 
     emailSyntaxVerification: (email: string): boolean => {
         return /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/.test(email);
     },
 
-    emailDatabaseVerification: (email: string): boolean => {
-        User.findOne({ email: email}, (err, result) => {
-            if(result) {
-                return false
-            }
-        })
-        return  true
-    },
+
 
     passwordVerification: (password: string): boolean => {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password);

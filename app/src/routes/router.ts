@@ -7,20 +7,24 @@ const router = express.Router();
 const { check } = require('express-validator')
 
 router.post("/signup", userController.signup)
+router.post("/signupTest", userController.signupTest)
 router.post("/signing", userController.signing)
 router.put("/changeEmail", userManagerController.changeEmail)
 router.put("/changePassword", userManagerController.changePassword)
 router.put("/changeAvatar", userManagerController.changeAvatar)
+router.put("/changeShockingContent", userManagerController.changeShockingContent)
+router.put("/changeVerticalReading", userManagerController.changeVerticalReading)
 router.delete("/delete", userManagerController.delete)
+router.delete("/deleteProd", userManagerController.deleteProd)
 
 router.delete("/API_1/:mailOldUnite/:mail",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     await res.status(204).json({"status": 201});
 })
 
-router.delete("/API_2",  async (req, res) => {
+router.post("/API_2",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    await res.status(201).json({"status": 204, "message": "ressource créé"});
+    await res.status(403).json({"status": 204, "msg": "Informations non valides"});
 })
 
 router.delete("/API_3/:mailOldUnite/:mail",  async (req, res) => {
