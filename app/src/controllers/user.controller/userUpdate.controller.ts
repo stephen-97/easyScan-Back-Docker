@@ -101,7 +101,9 @@ module.exports = {
             }
         })
 
-        return res.status(200).json({ msg: 'Modification effectué !'})
+        const userUpdated = await User.findOne({'email': decodedToken.email});
+        const newJwt = securityService.generateJwt(userUpdated);
+        return res.status(200).json({ msg: 'Modification effectué !', jwt: newJwt})
     },
 
 
@@ -120,7 +122,9 @@ module.exports = {
             }
         })
 
-        return res.status(200).json({ msg: 'Modification effectué !'})
+        const userUpdated = await User.findOne({'email': decodedToken.email});
+        const newJwt = securityService.generateJwt(userUpdated);
+        return res.status(200).json({ msg: 'Modification effectué !', 'verticalReading': userUpdated.verticalReading, jwt: newJwt})
     },
 
 }

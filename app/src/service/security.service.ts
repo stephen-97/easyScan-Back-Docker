@@ -21,7 +21,9 @@ module.exports = {
             username: user.username,
             email: user.email,
             avatar: user.avatar,
-            createdAd: utilityService.convertDatetimeToFormat(user.createdAt)
+            createdAd: utilityService.convertDatetimeToFormat(user.createdAt),
+            verticalReading: user.verticalReading,
+            shockingContent: user.shockingContent,
         }
         return jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn: '24h'});
     },

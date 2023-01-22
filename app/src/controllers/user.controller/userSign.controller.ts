@@ -8,13 +8,12 @@ const mongoose = require("mongoose");
 const userService  = require('../../service/user.service.ts');
 const securityService = require('../../service/security.service')
 const imageUploaderService = require('../../service/imageUploader.service')
-const bcrypt = require("bcrypt");
+const validationFunctionService = require('../../service/validations.service/validationFunction.service')
 import jwt_decode from "jwt-decode";
 
 module.exports = {
     signup: async (req: Request, res: Response) => {
-        if(!validationResult(req).isEmpty()) return res.status(400).json({status:400, msg: 'Erreur requête'})
-
+        console.log(req.body)
         //vérifications
         if(!userService.usernameSyntaxVerification(req.body.username)) return res.status(401).json({status: 401, msg: 'Email non conforme'})
         if(await userService.usernameDatabaseVerification(req.body.username)) return res.status(401).json({status: 401, msg: 'Un compte utilise déjà ce pseudo'})
@@ -49,20 +48,21 @@ module.exports = {
     },
 
     signing: async (req: Request, res: Response) => {
-
-        //Vérifie si la requête n'est pas json vide
-        if(!validationResult(req).isEmpty()) return res.json({status:400, msg: 'Erreur requête'})
-
+        //return res.status(404).json({ msg: req.body})
         //vérifications
+        if (validationFunctionService.validationFunction(req)){
+            return res.status(400).json(validationFunctionService.validationFunction(req))
+        }
+
         const user = await userService.loginVerification(req.body.emailOrUsername)
 
-        if(!user) return res.json({ status: 404, msg: 'informations incorrect'})
+        if(!user) return res.status(404).json({ msg: 'informations incorrect'})
 
         const correctPassword = await securityService.comparePassword(req.body.password, user.password)
-        if(!correctPassword) return res.json({ status: 404, msg: 'informations incorrect'})
+        if(!correctPassword) return res.status(404).json({ msg: 'informations incorrect'})
 
         const jwt = securityService.generateJwt(user);
-        return res.json({ status: 200, msg: 'Connexion avec succès', jwt: jwt})
+        return res.status(200).json({  msg: 'Connexion avec succès', jwt: jwt})
     },
 }
 /**

@@ -1,13 +1,17 @@
+import {body} from "express-validator";
+
 export {}
 const express = require("express");
 const userSignController = require('../controllers/user.controller/userSign.controller')
 const userDeleteController = require('../controllers/user.controller/userDelete.controller')
 const userUpdateController = require('../controllers/user.controller/userUpdate.controller')
 const router = express.Router();
-const { check } = require('express-validator')
+
+const userSignValidation = require('../service/validations.service/userValidation.service/userSignValidation.service')
+// ...rest of the initial code omitted for simplicity.
 
 router.post("/signup", userSignController.signup)
-router.post("/signing", userSignController.signing)
+router.post("/signing", userSignValidation.userSignInValidation, userSignController.signing)
 router.put("/changeEmail", userUpdateController.changeEmail)
 router.put("/changePassword", userUpdateController.changePassword)
 router.put("/changeAvatar", userUpdateController.changeAvatar)
