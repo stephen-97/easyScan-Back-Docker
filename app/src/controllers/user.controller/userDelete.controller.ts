@@ -2,19 +2,26 @@ import {Request, Response} from "express";
 
 export{}
 const User = require("../../models/user.model.ts");
-const securityService = require('../../service/security.service')
+
+// Services
+const passwordService = require('../../service/password.service/password.service');
 const jsonWebTokenService = require('../../service/jsonWebToken.service/jsonWebToken.service');
+const validationFunctionService = require('../../service/validations.service/validationFunction.service');
 
 module.exports = {
 
 
     delete: async (req: Request, res: Response) => {
-        const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
-        if(!securityService.jwtValidity(jwt)) return res.status(404).json({'msg': 'Token incorrect'})
-        const decodedToken = securityService.jwtValidity(jwt);
+
+        if (validationFunctionService.validationFunction(req)){
+            return res.status(400).json(validationFunctionService.validationFunction(req))
+        }
+
+        if(!jsonWebTokenService.jwtValidity(req.headers.authorization)) return res.status(404).json({'msg': 'Token incorrect'})
+        const decodedToken = jsonWebTokenService.jwtValidity(req.headers.authorization);
 
         const user = await User.findOne({'email': decodedToken.email});
-        const correctPassword = await securityService.comparePassword(req.body.password, user.password);
+        const correctPassword = await passwordService.comparePassword(req.body.password, user.password);
         if(!correctPassword) return res.status(403).json({'msg' : 'Mauvais mot de passe'})
 
         await User.deleteOne({"email" : user.email})

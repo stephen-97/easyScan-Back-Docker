@@ -1,43 +1,45 @@
 import {Request, Response} from "express";
 const { body } = require("express-validator")
 
-const jwt = require("jsonwebtoken");
-
 module.exports = {
 
     userSignInValidation : [
         body("emailOrUsername")
-            .exists()
-            .isString()
-            .isLength({min: 3}),
+            .exists().bail()
+            .isString().bail()
+            .withMessage('Need to be a string')
+            .isLength({min: 3}).bail()
+            .withMessage('Wrong length'),
         body("password")
-            .exists()
-            .isString()
-            .isLength({min: 3}),
+            .exists().bail()
+            .isString().bail()
+            .withMessage('Need to be a string')
+            .isLength({min: 3}).bail()
+            .withMessage('Wrong length'),
     ],
 
     userSignUpValidation : [
         body("email")
-            .exists()
-            .isEmail()
-            .isString()
-            .isLength({min: 3}),
+            .exists().bail()
+            .isEmail().bail()
+            .withMessage('Need to be an email')
+            .isLength({min: 3}).bail(),
         body("username")
-            .exists()
-            .isEmail()
-            .isString()
-            .isLength({max: 15}),
+            .exists().bail()
+            .isString().bail()
+            .withMessage('Need to be an string')
+            .isLength({min: 3, max: 15}).bail()
+            .withMessage('Wrong length'),
         body("password")
-            .exists()
-            .isString()
-            .isLength({min: 5, max: 15}),
-        body("confirmPassword")
-            .exists()
-            .isString()
-            .isLength({min: 5, max: 15}),
+            .exists().bail()
+            .isString().bail()
+            .withMessage('Need to be string')
+            .isLength({min: 5, max: 15})
+            .withMessage('Wrong length'),
         body("avatar")
-            .optional()
-            .isBase64(),
+            .isBase64()
+            .optional({checkFalsy: true})
+            .bail(),
     ]
 }
 export {}

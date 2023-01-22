@@ -1,28 +1,32 @@
 import {Request, Response} from "express";
 
 export{}
-const User = require("../../models/user.model.ts");
-const { validationResult } = require('express-validator');
-const uniqueValidator = require('mongoose-unique-validator');
-const mongoose = require("mongoose");
-const userService  = require('../../service/user.service.ts');
-const securityService = require('../../service/security.service')
-const imageUploaderService = require('../../service/imageUploader.service')
+const User = require("../../models/user.model.ts")
+const { validationResult } = require('express-validator')
+const uniqueValidator = require('mongoose-unique-validator')
+const mongoose = require("mongoose")
+
+// Services
+const userService  = require('../../service/userManager.service/user.service.ts')
+const passwordService = require('../../service/password.service/password.service')
+const jsonWebTokenService = require('../../service/jsonWebToken.service/jsonWebToken.service')
+const imageUploaderService = require('../../service/files.service/imageUploader.service')
 const validationFunctionService = require('../../service/validations.service/validationFunction.service')
 import jwt_decode from "jwt-decode";
 
 module.exports = {
     signup: async (req: Request, res: Response) => {
-        console.log(req.body)
-        //vérifications
-        if(!userService.usernameSyntaxVerification(req.body.username)) return res.status(401).json({status: 401, msg: 'Email non conforme'})
+
+        if (validationFunctionService.validationFunction(req)){
+            return res.status(400).json(validationFunctionService.validationFunction(req))
+        }
+
         if(await userService.usernameDatabaseVerification(req.body.username)) return res.status(401).json({status: 401, msg: 'Un compte utilise déjà ce pseudo'})
-        if(!userService.emailSyntaxVerification(req.body.email)) return res.status(401).json({status: 401, msg: 'Email non conforme'})
         if(await userService.emailDatabaseVerification(req.body.email)) return res.status(401).json({status: 401, msg: 'Un compte utilise déjà cet email'})
 
         // Need hashedPassowrd, tokenVerification for email verification and avatarUploadedFile
-        const hashedPassword =  await securityService.hashPassword(req.body.password);
-        const tokenVerification = securityService.generateJwt(req.body.email);
+        const hashedPassword =  await passwordService.hashPassword(req.body.password);
+        const tokenVerification = jsonWebTokenService.generateJwt(req.body.email);
         const avatarFileName = imageUploaderService.avatarUploader(req.body.avatar, req.body.username);
 
         // Create the new User object
@@ -55,13 +59,12 @@ module.exports = {
         }
 
         const user = await userService.loginVerification(req.body.emailOrUsername)
+        if(!user) return res.status(400).json({ msg: 'informations incorrect'})
 
-        if(!user) return res.status(404).json({ msg: 'informations incorrect'})
+        const correctPassword = await passwordService.comparePassword(req.body.password, user.password)
+        if(!correctPassword) return res.status(400).json({ msg: 'informations incorrect'})
 
-        const correctPassword = await securityService.comparePassword(req.body.password, user.password)
-        if(!correctPassword) return res.status(404).json({ msg: 'informations incorrect'})
-
-        const jwt = securityService.generateJwt(user);
+        const jwt = jsonWebTokenService.generateJwt(user);
         return res.status(200).json({  msg: 'Connexion avec succès', jwt: jwt})
     },
 }

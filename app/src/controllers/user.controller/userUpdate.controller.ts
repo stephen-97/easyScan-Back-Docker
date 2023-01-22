@@ -5,33 +5,39 @@ const User = require("../../models/user.model.ts");
 const { validationResult } = require('express-validator');
 const uniqueValidator = require('mongoose-unique-validator');
 const mongoose = require("mongoose");
-const userService  = require('../../service/user.service.ts');
-const securityService = require('../../service/security.service')
+
+// Services
+const userService  = require('../../service/userManager.service/user.service.ts');
+const passwordService = require('../../service/password.service/password.service');
 const jsonWebTokenService = require('../../service/jsonWebToken.service/jsonWebToken.service');
-const imageUploaderService = require('../../service/imageUploader.service')
+const imageUploaderService = require('../../service/files.service/imageUploader.service')
+
+const validationFunctionService = require('../../service/validations.service/validationFunction.service')
+
 const bcrypt = require("bcrypt");
 
 module.exports = {
 
 
     changeEmail: async (req: Request, res: Response) => {
-        const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
 
-        if(!securityService.jwtValidity(jwt)) return res.status(404).json({'msg': 'Incorrect'})
-        const decodedToken = securityService.jwtValidity(jwt);
+        if (validationFunctionService.validationFunction(req)){
+            return res.status(400).json(validationFunctionService.validationFunction(req))
+        }
 
-        if(!userService.emailSyntaxVerification(req.body.email)) return res.status(400).json({'msg' : 'Paramètres incorrects'})
-        if(!userService.emailSyntaxVerification(req.body.emailConfirm)) return res.status(400).json({'msg' : 'Paramètres incorrects'})
+        if(!jsonWebTokenService.jwtValidity(req.headers.authorization)) return res.status(404).json({'msg': 'Incorrect'})
+        const decodedToken = jsonWebTokenService.jwtValidity(req.headers.authorization);
+
         if(req.body.email !== req.body.emailConfirm) return res.status(400).json({message: "paramètres incorrect"});
 
         const user = await User.findOne({'email': decodedToken.email});
-        const correctPassword = await securityService.comparePassword(req.body.password, user.password);
+        const correctPassword = await passwordService.comparePassword(req.body.password, user.password);
         if(!correctPassword) return res.status(403).json({'msg' : 'Mauvais mot de passe'})
 
         const filter = { "email": decodedToken.email };
         const update = { "email": req.body.email}
-
         await User.updateOne(filter, update);
+
         return res.status(200).json({ message: 'Email modifié avec succès'})
     },
 
@@ -39,19 +45,22 @@ module.exports = {
 
 
     changePassword: async (req: Request, res: Response) => {
-        const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
-        if(!securityService.jwtValidity(jwt)) return res.status(404).json({'msg': 'Token incorrect'})
-        const decodedToken = securityService.jwtValidity(jwt);
+        if (validationFunctionService.validationFunction(req)){
+            return res.status(400).json(validationFunctionService.validationFunction(req))
+        }
+
+        if(!jsonWebTokenService.jwtValidity(req.headers.authorization)) return res.status(404).json({'msg': 'Token incorrect'})
+        const decodedToken = jsonWebTokenService.jwtValidity(req.headers.authorization);
 
         const user = await User.findOne({'email': decodedToken.email});
         if(!userService.passwordVerification(req.body.newPassword)) return res.status(400).json({message: "paramètres incorrect 1"})
         if(!userService.passwordVerification(req.body.newPasswordConfirm)) return res.status(400).json({message: "paramètres incorrect 2"})
         if(req.body.newPassword !== req.body.newPasswordConfirm) return res.status(400).json({message: "paramètres incorrect 3"});
 
-        const correctPassword = await securityService.comparePassword(req.body.currentPassword, user.password);
+        const correctPassword = await passwordService.comparePassword(req.body.currentPassword, user.password);
         if(!correctPassword) return res.status(403).json({'msg' : 'Mauvais mot de passe'})
 
-        const newPassword = await securityService.hashPassword(req.body.newPassword);
+        const newPassword = await passwordService.hashPassword(req.body.newPassword);
         user.update({'password' : newPassword});
 
         const filter = { "email": decodedToken.email };
@@ -64,8 +73,12 @@ module.exports = {
 
 
     changeAvatar: async (req: Request, res: Response) => {
-        if(!securityService.jwtValidity(req.headers.authorization)) return res.status(404).json({'msg': 'Token incorrect'})
-        const decodedToken = securityService.jwtValidity(req.headers.authorization);
+        if (validationFunctionService.validationFunction(req)){
+            return res.status(400).json(validationFunctionService.validationFunction(req))
+        }
+
+        if(!jsonWebTokenService.jwtValidity(req.headers.authorization)) return res.status(404).json({'msg': 'Token incorrect'})
+        const decodedToken = jsonWebTokenService.jwtValidity(req.headers.authorization);
 
         const user = await User.findOne({'email': decodedToken.email});
         if(decodedToken.avatar) imageUploaderService.avatarDeleteFile(user.avatar)
@@ -81,17 +94,18 @@ module.exports = {
         })
 
         const userUpdated = await User.findOne({'email': decodedToken.email});
-        const newJwt = securityService.generateJwt(userUpdated);
+        const newJwt = jsonWebTokenService.generateJwt(userUpdated);
         return res.status(200).json({ msg: 'Avatar modifié avec succès', jwt: newJwt})
     },
 
 
     changeShockingContent: async (req: Request, res: Response) => {
-         if(typeof req.body.shockingContent !== "boolean") return res.status(400).json({'msg': 'Mauvais paramètres'})
+        if (validationFunctionService.validationFunction(req)){
+            return res.status(400).json(validationFunctionService.validationFunction(req))
+        }
 
-         const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
-         if(!securityService.jwtValidity(jwt)) return res.status(400).json({'msg': 'Token incorrect'})
-         const decodedToken = securityService.jwtValidity(jwt);
+         if(!jsonWebTokenService.jwtValidity(req.headers.authorization)) return res.status(400).json({'msg': 'Token incorrect'})
+         const decodedToken = jsonWebTokenService.jwtValidity(req.headers.authorization);
 
          const filter = { "username": decodedToken.username };
          const update = { "shockingContent": req.body.shockingContent }
@@ -102,17 +116,19 @@ module.exports = {
         })
 
         const userUpdated = await User.findOne({'email': decodedToken.email});
-        const newJwt = securityService.generateJwt(userUpdated);
+        const newJwt = jsonWebTokenService.generateJwt(userUpdated);
         return res.status(200).json({ msg: 'Modification effectué !', jwt: newJwt})
     },
 
 
     changeVerticalReading: async (req: Request, res: Response) => {
-        if(typeof req.body.verticalReading !== "boolean") return res.status(400).json({'msg': 'Mauvais paramètres'})
+        if (validationFunctionService.validationFunction(req)){
+            return res.status(400).json(validationFunctionService.validationFunction(req))
+        }
 
-        const jwt = jsonWebTokenService.jwtRemoveBearerFromString(req.headers.authorization)
-        if(!securityService.jwtValidity(jwt)) return res.status(400).json({'msg': 'Token incorrect'})
-        const decodedToken = securityService.jwtValidity(jwt);
+
+        if(!jsonWebTokenService.jwtValidity(req.headers.authorization)) return res.status(400).json({'msg': 'Token incorrect'})
+        const decodedToken = jsonWebTokenService.jwtValidity(req.headers.authorization);
 
         const filter = { "username": decodedToken.username };
         const update = { "verticalReading": req.body.verticalReading }
@@ -123,7 +139,7 @@ module.exports = {
         })
 
         const userUpdated = await User.findOne({'email': decodedToken.email});
-        const newJwt = securityService.generateJwt(userUpdated);
+        const newJwt = jsonWebTokenService.generateJwt(userUpdated);
         return res.status(200).json({ msg: 'Modification effectué !', 'verticalReading': userUpdated.verticalReading, jwt: newJwt})
     },
 

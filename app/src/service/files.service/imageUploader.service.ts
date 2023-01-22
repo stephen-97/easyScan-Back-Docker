@@ -1,5 +1,5 @@
 export {}
-const User = require("../models/user.model");
+const User = require("../../models/user.model");
 const { dirname } = require('path');
 const { constants, promises: { access } } = require('fs');
 const fs = require('fs')

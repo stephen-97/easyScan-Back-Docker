@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
 
-const User = require("../models/user.model");
+const User = require("../../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -37,6 +37,7 @@ module.exports = {
     passwordVerification: (password: string): boolean => {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password);
     },
+
 
     loginVerification: async (usernameOrEmail: string) => {
         switch (module.exports.emailSyntaxVerification(usernameOrEmail)){

@@ -12,14 +12,18 @@ module.exports = {
             .withMessage("Missing Authorization Header"),
         body("email")
             .exists()
-            .isEmail(),
+            .isEmail()
+            .withMessage("Need to be an email"),
         body("emailConfirm")
             .exists()
-            .isEmail(),
+            .isEmail()
+            .withMessage("Need to be an email"),
         body("password")
             .exists()
             .isString()
+            .withMessage("Need to be an String")
             .isLength({min: 3})
+            .withMessage("Wrong length"),
     ],
 
     userUpdatePasswordValidation : [
@@ -27,17 +31,19 @@ module.exports = {
             .exists()
             .withMessage("Missing Authorization Header"),
         body("newPassword")
-            .exists()
-            .isString()
-            .isLength({min: 3}),
+            .exists().bail()
+            .isString().bail().withMessage("Need to be an String")
+            .isLength({min: 3}).bail().withMessage("Wrong length"),
         body("newPasswordConfirm")
-            .exists()
-            .isString()
-            .isLength({min: 3}),
+            .exists().bail()
+            .isString().bail().withMessage("Need to be an String")
+            .isLength({min: 3}).bail().withMessage("Wrong length"),
         body("currentPassword")
-            .exists()
-            .isString()
-            .isLength({min: 3})
+            .exists().bail()
+            .isString().bail()
+            .withMessage("Need to be an String")
+            .isLength({min: 3}).bail()
+            .withMessage("Wrong length")
     ],
 
     userUpdateAvatarValidation : [
@@ -47,7 +53,9 @@ module.exports = {
         body("avatar")
             .exists()
             .isBase64()
-            .isLength({min: 3}),
+            .withMessage("Need to be base64")
+            .isLength({min: 3})
+            .withMessage("Wrong length"),
     ],
 
     userUpdateShockingContentValidation : [
@@ -57,6 +65,7 @@ module.exports = {
         body("shockingContent")
             .exists()
             .isBoolean()
+            .withMessage("Need to be Boolean")
     ],
 
     userUpdateVerticalReadingValidation : [
@@ -66,6 +75,7 @@ module.exports = {
         body("verticalReading")
             .exists()
             .isBoolean()
+            .withMessage("Need to be Boolean")
     ],
 
 }

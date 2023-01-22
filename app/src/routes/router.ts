@@ -4,20 +4,24 @@ export {}
 const express = require("express");
 const userSignController = require('../controllers/user.controller/userSign.controller')
 const userDeleteController = require('../controllers/user.controller/userDelete.controller')
+
 const userUpdateController = require('../controllers/user.controller/userUpdate.controller')
+
 const router = express.Router();
 
 const userSignValidation = require('../service/validations.service/userValidation.service/userSignValidation.service')
+const userUpdateValidation = require('../service/validations.service/userValidation.service/userUpdateValidation.service')
+const userDeleteValidation = require('../service/validations.service/userValidation.service/userDeleteValidation.service')
 // ...rest of the initial code omitted for simplicity.
 
-router.post("/signup", userSignController.signup)
+router.post("/signup", userSignValidation.userSignUpValidation,userSignController.signup)
 router.post("/signing", userSignValidation.userSignInValidation, userSignController.signing)
-router.put("/changeEmail", userUpdateController.changeEmail)
-router.put("/changePassword", userUpdateController.changePassword)
-router.put("/changeAvatar", userUpdateController.changeAvatar)
-router.put("/changeShockingContent", userUpdateController.changeShockingContent)
-router.put("/changeVerticalReading", userUpdateController.changeVerticalReading)
-router.delete("/delete", userDeleteController.delete)
+router.put("/changeEmail", userUpdateValidation.userUpdateEmailValidation, userUpdateController.changeEmail)
+router.put("/changePassword",  userUpdateValidation.userUpdatePasswordValidation, userUpdateController.changePassword)
+router.put("/changeAvatar",  userUpdateValidation.userUpdateAvatarValidation, userUpdateController.changeAvatar)
+router.put("/changeShockingContent",  userUpdateValidation.userUpdateShockingContentValidation, userUpdateController.changeShockingContent)
+router.put("/changeVerticalReading", userUpdateValidation.userUpdateVerticalReadingValidation,  userUpdateController.changeVerticalReading)
+router.delete("/delete", userDeleteValidation.userDeleteAccountInValidation ,userDeleteController.delete)
 router.delete("/deleteProd", userDeleteController.deleteProd)
 
 router.delete("/API_1/:mailOldUnite/:mail",  async (req, res) => {
