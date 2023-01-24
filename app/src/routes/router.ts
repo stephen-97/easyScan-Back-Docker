@@ -51,7 +51,7 @@ router.delete("/API_5/:mailOldUnite/:mail",  async (req, res) => {
 
 router.post("/API_6",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    await res.status(201).json({'mail' : 'test1@hotmail.com', 'rio': '123456'});
+    await res.status(201).json({});
 })
 
 router.delete("/API_7/:mail",  async (req, res) => {
@@ -72,33 +72,6 @@ router.post("/API_9",  async (req, res) => {
 })
 router.post("/API_10",  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    await res.status(201).json({
-        "mail": "newuser@gendarmerie.interieur.gouv.fr",
-        "type": "Bali",
-        "cyrusRefProvider": "basic.ref_cyrus_persister",
-        "cyrusHostProvider": "dappmcepers01.pgs",
-        "cyrus": {
-            "uniqueid": "0cx41wj7lbe0f7vr37zhsa3v",
-            "uid": "user\/newuser@gendarmerie.interieur.gouv.fr",
-            "acls": [
-                {
-                    "key": "newuser@gendarmerie.interieur.gouv.fr",
-                    "value": "lrswipkxtecdan"
-                }
-            ],
-            "msg": "Completed"
-        },
-        "references": {
-            "mail": "newuser@gendarmerie.interieur.gouv.fr",
-            "host": "dappmcepers01.pgs",
-            "id": "0cx41wj7lbe0f7vr37zhsa3v",
-            "perimeter": "MCE",
-            "type": "Bali",
-            "nom": "nom",
-            "prenom": "prenom",
-            "displayname": "newuser",
-            "active": true
-        }
-    });
+    await res.status(201).json({ });
 })
 module.exports = router;

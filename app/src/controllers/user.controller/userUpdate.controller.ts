@@ -24,7 +24,6 @@ module.exports = {
         if (validationFunctionService.validationFunction(req)){
             return res.status(400).json(validationFunctionService.validationFunction(req))
         }
-
         if(!jsonWebTokenService.jwtValidity(req.headers.authorization)) return res.status(404).json({'msg': 'Incorrect'})
         const decodedToken = jsonWebTokenService.jwtValidity(req.headers.authorization);
 
@@ -38,7 +37,7 @@ module.exports = {
         const update = { "email": req.body.email}
         await User.updateOne(filter, update);
 
-        return res.status(200).json({ message: 'Email modifié avec succès'})
+        return res.status(201).json({ message: 'Email modifié avec succès'})
     },
 
 
