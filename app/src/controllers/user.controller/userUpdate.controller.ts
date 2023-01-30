@@ -80,11 +80,13 @@ module.exports = {
         const decodedToken = jsonWebTokenService.jwtValidity(req.headers.authorization);
 
         const user = await User.findOne({'email': decodedToken.email});
-        if(decodedToken.avatar) imageUploaderService.avatarDeleteFile(user.avatar)
+        if(user.avatar) imageUploaderService.avatarDeleteFile(user.avatar)
         const newAvatarFileName = imageUploaderService.avatarUploader(req.body.avatar, user.username);
 
         const update = { "avatar": newAvatarFileName };
         const filter = { "email": user.email }
+
+        //On update l'utilisateur avec le nouvel avatar
         User.updateOne(filter, update, null, (err) => {
             if(err){
                 imageUploaderService.avatarDeleteFile(newAvatarFileName);
@@ -94,7 +96,7 @@ module.exports = {
 
         const userUpdated = await User.findOne({'email': decodedToken.email});
         const newJwt = jsonWebTokenService.generateJwt(userUpdated);
-        return res.status(200).json({ msg: 'Avatar modifié avec succès', jwt: newJwt})
+        return res.status(201).json({ msg: 'Avatar modifié avec succès', jwt: newJwt})
     },
 
 
