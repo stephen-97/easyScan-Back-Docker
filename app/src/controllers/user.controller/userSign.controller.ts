@@ -39,7 +39,7 @@ module.exports = {
             avatar: avatarFileName,
         })
 
-
+        // Sauvegarde de l'utilisateur
         user.save((err) => {
             if(err){
                 if(avatarFileName) {
@@ -58,12 +58,15 @@ module.exports = {
             return res.status(400).json(validationFunctionService.validationFunction(req))
         }
 
+        //Vérification login
         const user = await userService.loginVerification(req.body.emailOrUsername)
         if(!user) return res.status(400).json({ msg: 'informations incorrect'})
 
+        //Comparaison des mots de passe
         const correctPassword = await passwordService.comparePassword(req.body.password, user.password)
         if(!correctPassword) return res.status(400).json({ msg: 'informations incorrect'})
 
+        //Génération du token
         const jwt = jsonWebTokenService.generateJwt(user);
         return res.status(200).json({  msg: 'Connexion avec succès', jwt: jwt})
     },
