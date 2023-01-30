@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 
 module.exports = {
     hashPassword: async (password: string) => {
-        const salt = await bcrypt.genSalt(10);
         return await new Promise((res, rej) => {
             bcrypt.hash(password, 10, (err, hash) => {
                 if(err) rej(err);

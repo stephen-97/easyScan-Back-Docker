@@ -6,9 +6,6 @@ const jwt = require("jsonwebtoken");
 
 module.exports = {
 
-    usernameSyntaxVerification: (username: string): boolean => {
-        return username.length > 3 && username.length < 20;
-    },
 
     usernameDatabaseVerification:  async (username: string) => {
         return await new Promise((res, rej) => {

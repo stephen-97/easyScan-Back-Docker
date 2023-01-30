@@ -20,8 +20,7 @@ module.exports = {
         const avatarType = module.exports.imageType(base64data.replace(/^data:image\/\w+;base64,/, ""))
         if(!avatarType) throw Error("Erreur, fichier non conforme")
         const avatarFileName = `${username}_${Math.floor(Math.random()*1E16)}.${avatarType}`
-
-        console.log(projectPath)
+        
         fs.writeFileSync(
             `${projectPath}/src/public/avatars/${avatarFileName}`,
             Buffer.from(base64data.replace(/^data:image\/\w+;base64,/, ""), 'base64'),
